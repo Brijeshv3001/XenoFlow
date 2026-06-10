@@ -1,0 +1,92 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Customer {
+  id              String    @id @default(uuid())
+  name            String
+  email           String    @unique
+  phone           String
+  city            String
+  signup_date     DateTime  @default(now())
+  total_spent     Float     @default(0)
+  order_count     Int       @default(0)
+  last_order_date DateTime?
+  tags            String    // JSON array of strings: e.g. '["VIP", "new"]'
+  rfm_score       String    @default("333")
+  created_at      DateTime  @default(now())
+  
+  orders          Order[]
+  messages        Message[]
+}
+
+model Order {
+  id           String   @id @default(uuid())
+  customer_id  String
+  product_name String
+  category     String   // tops, bottoms, accessories, footwear
+  amount       Float
+  order_date   DateTime @default(now())
+  status       String   // completed, returned, processing
+  campaign_id  String?  // Linked campaign ID for revenue attribution
+
+  customer     Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+}
+
+model Segment {
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  rules_json     String   // JSON query format of segment rules
+  customer_count Int      @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model Campaign {
+  id                 String    @id @default(uuid())
+  name               String
+  segment_id         String?
+  channel            String    // WhatsApp, SMS, Email, RCS
+  message_template   String
+  status             String    // draft, scheduled, running, completed
+  scheduled_at       DateTime?
+  sent_count         Int       @default(0)
+  delivered_count    Int       @default(0)
+  opened_count       Int       @default(0)
+  clicked_count      Int       @default(0)
+  failed_count       Int       @default(0)
+  revenue_attributed Float     @default(0.0)
+  created_at         DateTime  @default(now())
+  
+  messages           Message[]
+}
+
+model Message {
+  id           String          @id @default(uuid())
+  campaign_id  String
+  customer_id  String
+  status       String          // queued, sent, delivered, opened, clicked, failed
+  sent_at      DateTime?
+  delivered_at DateTime?
+  opened_at    DateTime?
+  clicked_at   DateTime?
+  
+  campaign     Campaign        @relation(fields: [campaign_id], references: [id], onDelete: Cascade)
+  customer     Customer        @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  events       CampaignEvent[]
+}
+
+model CampaignEvent {
+  id         String   @id @default(uuid())
+  message_id String
+  event_type String   // queued, sent, delivered, opened, clicked, failed
+  timestamp  DateTime @default(now())
+
+  message    Message  @relation(fields: [message_id], references: [id], onDelete: Cascade)
+}
