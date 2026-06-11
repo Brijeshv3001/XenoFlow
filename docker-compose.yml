@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  # 1. Production PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: xeno-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: xeno
+      POSTGRES_PASSWORD: xenosecretpassword
+      POSTGRES_DB: xenocrm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # 2. Standalone Express Backend (Channel Service)
+  channel-service:
+    build:
+      context: ./apps/channel-service
+      dockerfile: Dockerfile
+    container_name: xeno-channel-service
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://xeno:xenosecretpassword@db:5432/xenocrm?sslmode=disable
+    depends_on:
+      - db
+
+  # 3. Next.js Frontend (Web Client)
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    container_name: xeno-web-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://xeno:xenosecretpassword@db:5432/xenocrm?sslmode=disable
+      - CHANNEL_SERVICE_URL=http://channel-service:3001
+      - CRM_RECEIPT_URL=http://web:3000/api/receipts
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+    depends_on:
+      - db
+      - channel-service
+
+volumes:
+  pgdata:
