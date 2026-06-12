@@ -93,6 +93,8 @@ class SqlitePool implements DbInterface {
           id TEXT PRIMARY KEY,
           campaign_id TEXT NOT NULL,
           customer_id TEXT NOT NULL,
+          rendered_text TEXT,
+          channel TEXT,
           status TEXT NOT NULL DEFAULT 'queued',
           external_id TEXT,
           failure_reason TEXT,
@@ -104,7 +106,6 @@ class SqlitePool implements DbInterface {
           updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
       `);
-
       this.db.run(`
         CREATE TABLE IF NOT EXISTS campaign_events (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -341,6 +342,8 @@ async function initPgSchema(pool: Pool) {
         id TEXT PRIMARY KEY,
         campaign_id TEXT NOT NULL,
         customer_id TEXT NOT NULL,
+        rendered_text TEXT,
+        channel TEXT,
         status TEXT NOT NULL DEFAULT 'queued',
         external_id TEXT,
         failure_reason TEXT,
@@ -352,6 +355,10 @@ async function initPgSchema(pool: Pool) {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Safety migrators to add columns if table was already created
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS rendered_text TEXT`);
+    await client.query(`ALTER TABLE messages ADD COLUMN IF NOT EXISTS channel TEXT`);
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS campaign_events (
