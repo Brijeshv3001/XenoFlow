@@ -237,11 +237,11 @@ class SqlitePool implements DbInterface {
       "SUM(CASE WHEN order_count > 1 THEN 1 ELSE 0 END)"
     );
     output = output.replace(
-      /COUNT\(\*\)\s+FILTER\s*\(WHERE\s+'vip'\s+=\s+ANY\(tags\)\)/gi,
+      /COUNT\(\*\)\s+FILTER\s*\(WHERE\s+tags\s+LIKE\s+'%vip%'\)/gi,
       "SUM(CASE WHEN tags LIKE '%vip%' THEN 1 ELSE 0 END)"
     );
     output = output.replace(
-      /COUNT\(\*\)\s+FILTER\s*\(WHERE\s+'at_risk'\s+=\s+ANY\(tags\)\)/gi,
+      /COUNT\(\*\)\s+FILTER\s*\(WHERE\s+tags\s+LIKE\s+'%at_risk%'\)/gi,
       "SUM(CASE WHEN tags LIKE '%at_risk%' THEN 1 ELSE 0 END)"
     );
     output = output.replace(

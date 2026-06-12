@@ -29,8 +29,8 @@ export async function getCustomers(opts: {
     i++;
   }
   if (tag) { 
-    conditions.push(`$${i} = ANY(tags)`); 
-    params.push(tag);
+    conditions.push(`tags LIKE $${i}`); 
+    params.push(`%${tag}%`);
     i++;
   }
 
@@ -73,8 +73,8 @@ export async function getDashboardStats() {
         COALESCE(SUM(total_spent), 0)                   AS total_revenue,
         COALESCE(ROUND(AVG(avg_order_value)::NUMERIC, 2), 0) AS avg_order_value,
         COUNT(*) FILTER (WHERE order_count > 1)         AS repeat_buyers,
-        COUNT(*) FILTER (WHERE 'vip' = ANY(tags))       AS vip_count,
-        COUNT(*) FILTER (WHERE 'at_risk' = ANY(tags))   AS at_risk_count,
+        COUNT(*) FILTER (WHERE tags LIKE '%vip%')       AS vip_count,
+        COUNT(*) FILTER (WHERE tags LIKE '%at_risk%')   AS at_risk_count,
         COUNT(*) FILTER (WHERE signup_date > NOW() - INTERVAL '30 days') AS new_this_month
       FROM customers
     `),

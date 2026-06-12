@@ -80,7 +80,7 @@ export async function createSegment(data: {
     JSON.stringify(data.rules), 
     sql, 
     count, 
-    data.is_ai_generated ?? false
+    (data.is_ai_generated ?? false) ? 1 : 0
   ]);
 
   const row = res.rows[0];

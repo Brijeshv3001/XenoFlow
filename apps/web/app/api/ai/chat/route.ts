@@ -96,7 +96,7 @@ async function executeTool(name: string, input: any) {
       if (input.min_days_since_order) conditions.push(`EXTRACT(DAY FROM NOW() - last_order_date) >= ${input.min_days_since_order}`);
       if (input.max_days_since_order) conditions.push(`EXTRACT(DAY FROM NOW() - last_order_date) <= ${input.max_days_since_order}`);
       if (input.city)                 conditions.push(`city = '${input.city.replace(/'/g, "''")}'`);
-      if (input.tag)                  conditions.push(`'${input.tag.replace(/'/g, "''")}' = ANY(tags)`);
+      if (input.tag)                  conditions.push(`tags LIKE '%${input.tag.replace(/'/g, "''")}%'`);
       const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
       const limit = Math.min(input.limit ?? 10, 50);
       const res = await db.query(

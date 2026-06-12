@@ -21,5 +21,8 @@
     "concurrently": "^8.2.2",
     "tsx": "^4.22.4",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "xeno-crm-web": "^0.1.0"
   }
 }
