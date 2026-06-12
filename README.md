@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=XenoCRM&fontSize=80&fontColor=fff&animation=twinkling" width="100%" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=XenoFlow&fontSize=80&fontColor=fff&animation=twinkling" width="100%" />
 
   <h3>AI-Native Mini CRM for D2C Brands</h3>
 
@@ -25,7 +25,7 @@
   </p>
 </div>
 
-> Most CRMs make the marketer do all the thinking. XenoCRM makes AI the co-pilot.
+> Most CRMs make the marketer do all the thinking. XenoFlow makes AI the co-pilot.
 
 ---
 
@@ -49,7 +49,7 @@
 
 Imagine you are **Lumé**, a fast-growing D2C fashion label preparing for a major festive season promotion. Traditionally, executing an audience outreach campaign requires writing complex SQL segment queries, copying data into spreadsheets, writing manual communication copies, uploading lists to SMS/WhatsApp gateways, and waiting hours or days to match CSV receipts back to sales dashboards. 
 
-**XenoCRM** eliminates this operational friction. By combining a modern web dashboard with an event-driven background messaging microservice and an embedded LLM copilot, marketers can transition from insight to automated messaging campaigns in seconds.
+**XenoFlow** eliminates this operational friction. By combining a modern web dashboard with an event-driven background messaging microservice and an embedded LLM copilot, marketers can transition from insight to automated messaging campaigns in seconds.
 
 ```
 +───────────────────────────────────────────────────────────────────+
@@ -219,7 +219,7 @@ Agent: "I found 87 VIP customers in Bangalore. I've created a new audience segme
 
 ```
 +─────────────+               +─────────────────+               +───────────────+
-│  Xeno CRM   │               │ Channel Service │               │ CRM Webhook   │
+│  XenoFlow   │               │ Channel Service │               │ CRM Webhook   │
 │  (Vercel)   │               │    (Render)     │               │  (/api/rcpt)  │
 +──────┬──────+               +────────┬────────+               +───────┬───────+
        │                               │                                │
@@ -348,7 +348,7 @@ npm run dev --workspace=apps/channel-service
 # Starts the CRM frontend + API routes
 npm run dev --workspace=apps/web
 ```
-Open [http://localhost:3000](http://localhost:3000) to access XenoCRM.
+Open [http://localhost:3000](http://localhost:3000) to access XenoFlow.
 
 ---
 

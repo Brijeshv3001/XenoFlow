@@ -36,7 +36,7 @@ export default function Sidebar({ onToggleAssistant, isAssistantOpen }: SidebarP
           <Store className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-white tracking-wide">XenoCRM</h1>
+          <h1 className="text-lg font-bold text-white tracking-wide">XenoFlow</h1>
           <p className="text-xs text-violet-400 font-medium">Lumé Fashion Brand</p>
         </div>
       </div>

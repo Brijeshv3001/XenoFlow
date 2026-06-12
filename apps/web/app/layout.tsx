@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'XenoCRM | Lumé Fashion Brand',
+  title: 'XenoFlow | Lumé Fashion Brand',
   description: 'AI-Native Mini CRM and Segmentation Engine for Lumé D2C Brand',
 };
 

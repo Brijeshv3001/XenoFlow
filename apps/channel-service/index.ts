@@ -48,7 +48,7 @@ app.post("/send", (req, res) => {
 
 app.get("/", (req, res) => {
   res.json({
-    service: "Xeno CRM Channel Service",
+    service: "XenoFlow Channel Service",
     status: "running",
     endpoints: {
       health: "/health",

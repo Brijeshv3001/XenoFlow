@@ -1,4 +1,4 @@
-# Xeno CRM - Deployment Guide
+# XenoFlow - Deployment Guide
 
 This guide explains how to deploy the **Frontend (Next.js)** and **Backend (Express Channel Service)** separately using different strategies:
 1. **Cloud Platforms** (Vercel + Render / Railway)

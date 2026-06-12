@@ -11,7 +11,7 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: 3000,
-        DATABASE_URL: "postgresql://xeno:xenosecretpassword@localhost:5432/xenocrm?sslmode=disable",
+        DATABASE_URL: "postgresql://xeno:xenosecretpassword@localhost:5432/xenoflow?sslmode=disable",
         CHANNEL_SERVICE_URL: "http://localhost:3001",
         CRM_RECEIPT_URL: "http://localhost:3000/api/receipts"
       }
@@ -26,7 +26,7 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: 3001,
-        DATABASE_URL: "postgresql://xeno:xenosecretpassword@localhost:5432/xenocrm?sslmode=disable"
+        DATABASE_URL: "postgresql://xeno:xenosecretpassword@localhost:5432/xenoflow?sslmode=disable"
       }
     }
   ]
