@@ -1,5 +1,7 @@
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=XenoCRM&fontSize=80&fontColor=fff&animation=twinkling&desc=AI-Native%20Mini%20CRM%20for%20D2C%20Brands&descAlignY=60" width="100%" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=XenoCRM&fontSize=80&fontColor=fff&animation=twinkling" width="100%" />
+
+  <h3>AI-Native Mini CRM for D2C Brands</h3>
 
   <p align="center">
     <a href="https://xeno-crm-web-khaki.vercel.app">
