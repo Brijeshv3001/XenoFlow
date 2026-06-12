@@ -46,6 +46,17 @@ app.post("/send", (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.json({
+    service: "Xeno CRM Channel Service",
+    status: "running",
+    endpoints: {
+      health: "/health",
+      send: "/send (POST)"
+    }
+  });
+});
+
 app.get("/health", (req, res) => {
   res.json({ status: "healthy", timestamp: new Date().toISOString() });
 });
