@@ -278,6 +278,157 @@ class SqlitePool implements DbInterface {
   }
 }
 
+async function initPgSchema(pool: Pool) {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS customers (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        phone TEXT NOT NULL,
+        total_spent REAL NOT NULL DEFAULT 0,
+        order_count INTEGER NOT NULL DEFAULT 0,
+        avg_order_value REAL NOT NULL DEFAULT 0,
+        last_order_date TEXT,
+        first_order_date TEXT,
+        signup_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        city TEXT NOT NULL,
+        state TEXT,
+        tags TEXT,
+        rfm_recency INTEGER,
+        rfm_frequency INTEGER,
+        rfm_monetary INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS segments (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        rules TEXT NOT NULL,
+        computed_sql TEXT,
+        customer_count INTEGER NOT NULL DEFAULT 0,
+        is_ai_generated INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS campaigns (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        segment_id TEXT,
+        channel TEXT NOT NULL,
+        message_template TEXT NOT NULL,
+        subject_line TEXT,
+        status TEXT NOT NULL DEFAULT 'draft',
+        total_recipients INTEGER NOT NULL DEFAULT 0,
+        sent_count INTEGER NOT NULL DEFAULT 0,
+        delivered_count INTEGER NOT NULL DEFAULT 0,
+        opened_count INTEGER NOT NULL DEFAULT 0,
+        clicked_count INTEGER NOT NULL DEFAULT 0,
+        failed_count INTEGER NOT NULL DEFAULT 0,
+        revenue_attributed REAL NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id TEXT PRIMARY KEY,
+        campaign_id TEXT NOT NULL,
+        customer_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'queued',
+        external_id TEXT,
+        failure_reason TEXT,
+        sent_at TEXT,
+        delivered_at TEXT,
+        opened_at TEXT,
+        clicked_at TEXT,
+        failed_at TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS campaign_events (
+        id SERIAL PRIMARY KEY,
+        message_id TEXT NOT NULL,
+        campaign_id TEXT NOT NULL,
+        customer_id TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        metadata TEXT,
+        occurred_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id TEXT PRIMARY KEY,
+        customer_id TEXT NOT NULL,
+        campaign_id TEXT,
+        product_name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        amount REAL NOT NULL,
+        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status TEXT NOT NULL DEFAULT 'completed'
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS receipt_idempotency (
+        idempotency_key TEXT PRIMARY KEY,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    const res = await client.query("SELECT COUNT(*) as count FROM customers");
+    if (parseInt(res.rows[0].count) === 0) {
+      const customers = [
+        ["cust_1", "Sriram Iyer", "sriram.iyer@gmail.com", "+919820012345", 12500, 5, 2500, "2026-05-10 14:00:00", "2025-10-01 10:00:00", "2025-10-01 10:00:00", "Mumbai", "Maharashtra", "vip,accessories", 4, 5, 5],
+        ["cust_2", "Priya Sharma", "priya.sharma@yahoo.com", "+919811023456", 8400, 3, 2800, "2026-05-15 11:30:00", "2025-12-15 12:00:00", "2025-12-15 12:00:00", "Delhi", "Delhi", "dresses", 4, 3, 4],
+        ["cust_3", "Rohan Das", "rohan.das@gmail.com", "+919845034567", 1200, 1, 1200, "2026-06-01 18:45:00", "2026-01-20 09:00:00", "2026-01-20 09:00:00", "Bangalore", "Karnataka", "basics", 5, 1, 1],
+        ["cust_4", "Aisha Khan", "aisha.khan@outlook.com", "+919920045678", 18000, 6, 3000, "2026-05-20 16:15:00", "2025-08-01 14:30:00", "2025-08-01 14:30:00", "Mumbai", "Maharashtra", "vip,dresses,kurtas", 4, 5, 5],
+        ["cust_5", "Vikram Patel", "vikram.patel@gmail.com", "+919724056789", 4500, 2, 2250, "2026-04-10 09:15:00", "2026-02-10 11:00:00", "2026-02-10 11:00:00", "Chennai", "Tamil Nadu", "basics", 3, 2, 3],
+        ["cust_6", "Kripa Chatterjee", "kripa.c@gmail.com", "+919830067890", 300, 1, 300, "2026-01-15 15:20:00", "2025-11-01 10:30:00", "2025-11-01 10:30:00", "Kolkata", "West Bengal", "basics", 1, 1, 1],
+        ["cust_7", "Sameer Deshmukh", "sameer.d@gmail.com", "+919822078901", 6700, 4, 1675, "2026-05-30 10:00:00", "2026-03-01 13:00:00", "2026-03-01 13:00:00", "Pune", "Maharashtra", "dresses", 5, 4, 4],
+        ["cust_8", "Kavya Reddy", "kavya.reddy@gmail.com", "+919848089012", 15500, 7, 2214, "2026-06-05 17:30:00", "2025-06-01 12:00:00", "2025-06-01 12:00:00", "Hyderabad", "Telangana", "vip,accessories", 5, 5, 5],
+        ["cust_9", "Ananya Sen", "ananya.sen@gmail.com", "+919820090123", 0, 0, 0, null, null, "2026-06-08 11:00:00", "Mumbai", "Maharashtra", null, 5, 1, 1],
+        ["cust_10", "Kabir Mehta", "kabir.mehta@gmail.com", "+919810001234", 9800, 4, 2450, "2026-06-08 19:00:00", "2025-09-15 15:00:00", "2025-09-15 15:00:00", "Delhi", "Delhi", "basics,dresses", 5, 4, 4]
+      ];
+
+      for (const c of customers) {
+        await client.query(`
+          INSERT INTO customers (id, name, email, phone, total_spent, order_count, avg_order_value, last_order_date, first_order_date, signup_date, city, state, tags, rfm_recency, rfm_frequency, rfm_monetary)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        `, c);
+      }
+
+      const orders = [
+        ["ord_1", "cust_1", null, "Lumé Silk Kurta", "tops", 3499, "2026-05-10 14:00:00", "completed"],
+        ["ord_2", "cust_2", null, "Lumé Denim Trousers", "bottoms", 2499, "2026-05-15 11:30:00", "completed"],
+        ["ord_3", "cust_4", null, "Lumé Linen Blazer", "tops", 4999, "2026-05-20 16:15:00", "completed"]
+      ];
+
+      for (const o of orders) {
+        await client.query(`
+          INSERT INTO orders (id, customer_id, campaign_id, product_name, category, amount, order_date, status)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, o);
+      }
+
+      console.log("[PostgreSQL DB] Initialized schema and pre-seeded customers & orders!");
+    }
+  } catch (err) {
+    console.error("Error during PG schema initialization:", err);
+  } finally {
+    client.release();
+  }
+}
+
 export function getDb(): DbInterface {
   const connectionString = process.env.DATABASE_URL || "file:./dev.db";
 
@@ -302,6 +453,7 @@ export function getDb(): DbInterface {
       connectionTimeoutMillis: 5000,
     });
     pgPool.on("error", (err) => console.error("Unexpected PostgreSQL DB error", err));
+    initPgSchema(pgPool).catch(err => console.error("Failed to init PG schema:", err));
   }
   
   return {
