@@ -12,13 +12,28 @@ import {
   Store
 } from 'lucide-react';
 
+import { useRouter } from 'next/navigation';
+
 interface SidebarProps {
   onToggleAssistant: () => void;
   isAssistantOpen: boolean;
+  adminUser?: { name: string; email: string } | null;
 }
 
-export default function Sidebar({ onToggleAssistant, isAssistantOpen }: SidebarProps) {
+export default function Sidebar({ onToggleAssistant, isAssistantOpen, adminUser }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' });
+      if (res.ok) {
+        router.push('/login');
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
 
   const navItems = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -80,14 +95,21 @@ export default function Sidebar({ onToggleAssistant, isAssistantOpen }: SidebarP
         </button>
 
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-900/40">
-          <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center font-bold text-violet-300 text-sm">
-            LM
+          <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center font-bold text-violet-300 text-sm flex-shrink-0">
+            {adminUser?.name ? adminUser.name.split(' ').map(n => n[0]).join('') : 'AD'}
           </div>
-          <div className="overflow-hidden">
-            <h4 className="text-xs font-semibold text-white truncate">Lumé Marketer</h4>
-            <p className="text-[10px] text-slate-500 truncate">admin@lume.in</p>
+          <div className="overflow-hidden flex-1">
+            <h4 className="text-xs font-semibold text-white truncate">{adminUser?.name || 'Admin Manager'}</h4>
+            <p className="text-[10px] text-slate-500 truncate">{adminUser?.email || 'admin@lume.in'}</p>
           </div>
         </div>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-950/30 transition-all duration-200"
+        >
+          Logout Session
+        </button>
       </div>
     </aside>
   );
